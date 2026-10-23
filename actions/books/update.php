@@ -1,18 +1,30 @@
 <?php
-
+session_start();
+require_once __DIR__ . "/../../validations/book-validation.php";
 require_once __DIR__ . "/../../config/database.php";
 
 if (isset($_POST['update']) && $_SERVER['REQUEST_METHOD'] === "POST") {
    try{    
       $pdo->beginTransaction();
 
-      $id = htmlspecialchars($_POST['id']);
-      $title = htmlspecialchars($_POST['title']);
-      $isbn = htmlspecialchars($_POST['isbn']);
-      $year = htmlspecialchars($_POST['year']);
-      $stock = htmlspecialchars($_POST['stock']);
-      $categoryId = htmlspecialchars($_POST['category_id']);
-      $description = htmlspecialchars($_POST['description']);
+      $request = getBookRequest($_POST);
+      $errors = validateBook($request, $request['id']);
+
+      if (count($errors) > 0){
+         $_SESSION['errors'] = $errors;
+         $_SESSION['old'] = $request;
+
+         header('Location: ../../pages/books/edit.php' . urlencode($request['id']));
+         exit;
+      }
+
+      $id = trim(htmlspecialchars($_POST['id']));
+      $title = trim(htmlspecialchars($_POST['title']));
+      $isbn = trim(htmlspecialchars($_POST['isbn']));
+      $year = trim(htmlspecialchars($_POST['year']));
+      $stock = trim(htmlspecialchars($_POST['stock']));
+      $categoryId = trim(htmlspecialchars($_POST['category_id']));
+      $description = trim(htmlspecialchars($_POST['description']));
       $authorIds = isset($_POST['author_ids']) ? $_POST['author_ids'] : [];
 
       $query = "update books set title = :title, isbn = :isbn, year = :year, stock = :stock, category_id = :category_id, description = :description 
@@ -21,28 +33,28 @@ if (isset($_POST['update']) && $_SERVER['REQUEST_METHOD'] === "POST") {
 
       $stmt = $pdo->prepare($query);
       $stmt->execute([
-         "title" => $title,
-         "isbn" => $isbn,
-         "year" => $year,
-         "stock" => $stock,
-         "category_id" => $categoryId,
-         "description" => $description,
-         "id" => $id
+         "title" => $request['title'],
+         "isbn" => $request['isbn'],
+         "year" => $request['year'],
+         "stock" => $request['stock'],
+         "category_id" => $request['category_id'],
+         "description" => $request['description'],
+         "id" => $request['id']
       ]);
 
       $query = "delete from book_author where book_id = :book_id";
       $stmt = $pdo->prepare($query);
       $stmt->execute([
-         "book_id" => $id
+         "book_id" => $request['id']
       ]);
 
       $query = "insert into book_author (book_id, author_id) values (:book_id, :author_id)";
       $stmt = $pdo->prepare($query);
 
-      $authorIds = isset($_POST["author_ids"]) ? $_POST["author_ids"] : [];
+      $authorIds = isset($request["author_ids"]) ? $request["author_ids"] : [];
       foreach($authorIds as $authorId){
          $stmt->execute([
-            "book_id" => $id,
+            "book_id" => $request['id'],
             "author_id" => $authorId
          ]);
       }
