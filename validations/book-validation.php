@@ -7,14 +7,14 @@ require_once __DIR__ . "/../repositories/author-repository.php";
 function getBookRequest($request)
 {
    return[
-      'id' => trim(htmlspecialchars($_POST['id'])),
-      'title' => trim(htmlspecialchars($_POST['title'])),
-      'isbn' => trim(htmlspecialchars($_POST['isbn'])),
-      'year' => trim(htmlspecialchars($_POST['year'])),
-      'stock' => trim(htmlspecialchars($_POST['stock'])),
-      'description' => trim(htmlspecialchars($_POST['description'])),
-      'category_id' => trim(htmlspecialchars($_POST['category_id'])),
-      'author_ids' => $_POST["author_ids"],
+      'id' => trim(htmlspecialchars($request['id'])),
+      'title' => trim(htmlspecialchars($request['title'])),
+      'isbn' => trim(htmlspecialchars($request['isbn'])),
+      'year' => trim(htmlspecialchars($request['year'])),
+      'stock' => trim(htmlspecialchars($request['stock'])),
+      'description' => trim(htmlspecialchars($request['description'])),
+      'category_id' => trim(htmlspecialchars($request['category_id'])),
+      'author_ids' => $request["author_ids"],
    ];
 }
 

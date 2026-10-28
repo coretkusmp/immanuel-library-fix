@@ -35,8 +35,9 @@ function hasRole(array $roles)
    return $isUserHasAuthorizeRole;
 }
 
-function requireAuth() {
-   if(!isLoggedIn()){
+function requireAuth()
+{
+   if (!isLoggedIn()) {
       $_SESSION['errors'] = [
          'login' => 'silahkan login terlebih dahulu sebelum mengakses halaman ini'
       ];
@@ -46,17 +47,19 @@ function requireAuth() {
    }
 }
 
-function requireRole(array $roles){
+function requireRole(array $roles)
+{
    requireAuth();
 
-   if(!hasRole($roles)){
+   if (!hasRole($roles)) {
       header('Location: ' . FORBIDDEN_URL);
       exit;
    }
 }
 
-function requireGuest(){
-   if(isLoggedIn()){
+function requireGuest()
+{
+   if (isLoggedIn()) {
       header('Location: ' . BOOK_INDEX_URL);
       exit;
    }
